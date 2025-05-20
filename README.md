@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="description" content="This is your ideal and easiest to do list that will helps you to organize tasks">
+  <meta name="keywords" content="to do list, To-Do List, Taches, tasks, to do, to-do, tasks list, list of tasks">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Advanced To-Do List</title>
+<style>
+  /* Reset and basic */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: #f0f4f8;
+    color: #222;
+    transition: background 0.3s, color 0.3s;
+  }
+  .dark-mode {
+    background: #121212;
+    color: #eee;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 30px;
+    background: #1e88e5;
+    color: white;
+  }
+  header h1 {
+    margin: 0; font-weight: 700;
+  }
+  #toggle-theme {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  main {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    position: relative;
+  }
+  .dark-mode main {
+    background: #222;
+    box-shadow: 0 10px 25px rgb(0 0 0 / 0.6);
+  }
+  #task-input-section {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+  }
+  #task-input {
+    flex: 1;
+    padding: 15px 20px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    transition: background 0.3s;
+  }
+  .dark-mode #task-input {
+    background: #333;
+    color: #eee;
+  }
+  #add-task-btn {
+    padding: 0 25px;
+    background: #1e88e5;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #add-task-btn:hover {
+    background: #1565c0;
+  }
+  ul#task-list {
+    list-style: none;
+    margin: 0;
+    padding: 20px;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+  ul#task-list li {
+    background: #e3f2fd;
+    margin-bottom: 12px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 17px;
+    cursor: default;
+    user-select: none;
+    transition: background 0.3s;
+  }
+  .dark-mode ul#task-list li {
+    background: #444;
+  }
+  ul#task-list li.completed {
+    text-decoration: line-through;
+    color: #777;
+  }
+  ul#task-list li button.delete-btn {
+    background: #e53935;
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  ul#task-list li button.delete-btn:hover {
+    background: #b71c1c;
+    transform: scale(1.1);
+  }
+  ul#task-list li input[type="checkbox"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+    cursor: pointer;
+  }
+  #filter-section {
+    padding: 15px 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+  }
+  .filter-btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 25px;
+    background: #e3f2fd;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: #1e88e5;
+    color: white;
+  }
+  .dark-mode #filter-section {
+    background: #181818;
+    border-top: 1px solid #333;
+  }
+  .dark-mode .filter-btn {
+    background: #444;
+    color: #ddd;
+  }
+  .dark-mode .filter-btn.active,
+  .dark-mode .filter-btn:hover {
+    background: #1e88e5;
+    color: white;
+  }
+  #settings-icon {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 60px; height: 60px;
+    background: #1e88e5;
+    border-radius: 50%;
+    box-shadow: 0 8px 15px rgb(30 136 229 / 0.4);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s, transform 0.3s;
+    z-index: 1000;
+  }
+  #settings-icon:hover {
+    background: #1565c0;
+    transform: scale(1.1);
+  }
+  #settings-icon svg {
+    fill: white;
+    width: 30px;
+    height: 30px;
+  }
+  #settings-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 350px;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    padding: 30px 25px;
+    overflow-y: auto;
+    z-index: 999;
+    color: #222;
+  }
+  .dark-mode #settings-panel {
+    background: #222;
+    color: #eee;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.7);
+  }
+  #settings-panel.open {
+    transform: translateX(0);
+  }
+  #settings-panel h2 {
+    margin-top: 0;
+    font-weight: 700;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #1e88e5;
+    padding-bottom: 8px;
+  }
+  .setting-group {
+    margin-bottom: 25px;
+  }
+  .setting-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  input[type="password"], input[type="text"], select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.3s;
+  }
+  input[type="password"]:focus, input[type="text"]:focus, select:focus {
+    border-color: #1e88e5;
+    outline: none;
+  }
+  button.setting-btn {
+    background: #1e88e5;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.3s;
+  }
+  button.setting-btn:hover {
+    background: #1565c0;
+  }
+  #error-msg {
+    color: red;
+    margin-top: 5px;
+    font-weight: 600;
+  }
+  #account-status {
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  #statistics {
+    background: #e3f2fd;
+    border-radius: 8px;
+    padding: 15px;
+  }
+  .dark-mode #statistics {
+    background: #333;
+  }
+  #statistics p {
+    margin: 8px 0;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>To-Do List</h1>
+  <button id="toggle-theme" title="Toggle Dark/Light Mode">🌙</button>
+</header>
+
+<main>
+  <section id="task-input-section">
+    <input id="task-input" type="text" placeholder="Add a new task..." />
+    <button id="add-task-btn">Add</button>
+  </section>
+  <ul id="task-list"></ul>
+  <section id="filter-section">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="completed">Completed</button>
+    <button class="filter-btn" data-filter="pending">Pending</button>
+  </section>
+</main>
+
+<!-- Settings icon -->
+<div id="settings-icon" title="Settings" aria-label="Open Settings">
+  <svg viewBox="0 0 24 24">
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 00.11-.63l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.92 7.92 0 00-1.7-.98l-.38-2.65a.5.5 0 00-.5-.42h-4a.5.5 0 00-.5.42l-.38 2.65a7.94 7.94 0 00-1.7.98l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.11.63l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 00-.11.63l2 3.46c.14.25.44.34.7.22l2.49-1c.52.4 1.1.72 1.7.98l.38 2.65c.05.28.28.49.5.49h4c.22 0 .45-.21.5-.49l.38-2.65c.6-.26 1.18-.58 1.7-.98l2.49 1c.26.12.56.03.7-.22l2-3.46a.5.5 0 00-.11-.63l-2.11-1.65zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/>
+  </svg>
+</div>
+
+<!-- Settings Panel -->
+<aside id="settings-panel" aria-hidden="true" aria-label="Settings Panel">
+  <h2>Settings</h2>
+
+  <!-- Language -->
+  <div class="setting-group">
+    <label for="language-select">Language / Langue / اللغة</label>
+    <select id="language-select" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="fr">Français</option>
+      <option value="ar">العربية</option>
+    </select>
+  </div>
+
+  <!-- PIN Code -->
+  <div class="setting-group">
+    <label for="pin-input">Set PIN Code</label>
+    <input type="password" id="pin-input" maxlength="6" placeholder="Enter 4-6 digit PIN" aria-describedby="pin-error" />
+    <button id="set-pin-btn" class="setting-btn">Set PIN</button>
+    <div id="pin-error" role="alert"></div>
+  </div>
+
+  <!-- Account -->
+  <div class="setting-group" id="account-section">
+    <label>Account</label>
+    <button id="login-btn" class="setting-btn">Login</button>
+    <button id="logout-btn" class="setting-btn" style="display:none;">Logout</button>
+    <div id="account-status"></div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="setting-group" id="stats-section">
+    <label>Statistics</label>
+    <div id="statistics">
+      <p>Total Tasks: <span id="total-tasks">0</span></p>
+      <p>Completed: <span id="completed-tasks">0</span></p>
+      <p>Pending: <span id="pending-tasks">0</span></p>
+    </div>
+  </div>
+</aside>
+
+<script>
+  // ==== Variables and Elements ====
+  const body = document.body;
+  const taskInput = document.getElementById('task-input');
+  const addTaskBtn = document.getElementById('add-task-btn');
+  const taskList = document.getElementById('task-list');
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const settingsIcon = document.getElementById('settings-icon');
+  const settingsPanel = document.getElementById('settings-panel');
+  const languageSelect = document.getElementById('language-select');
+  const pinInput = document.getElementById('pin-input');
+  const setPinBtn = document.getElementById('set-pin-btn');
+  const pinError = document.getElementById('pin-error');
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const accountStatus = document.getElementById('account-status');
+  const totalTasksSpan = document.getElementById('total-tasks');
+  const completedTasksSpan = document.getElementById('completed-tasks');
+  const pendingTasksSpan = document.getElementById('pending-tasks');
+  const toggleThemeBtn = document.getElementById('toggle-theme');
+
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  let pinCode = localStorage.getItem('pinCode') || null;
+  let isLoggedIn = false;
+  let currentLanguage = localStorage.getItem('language') || 'en';
+  let filterStatus = 'all';
+
+  // ==== Language data ====
+  const translations = {
+    en: {
+      placeholder: "Add a new task...",
+      add: "Add",
+      all: "All",
+      completed: "Completed",
+      pending: "Pending",
+      settings: "Settings",
+      languageLabel: "Language / Langue / اللغة",
+      setPin: "Set PIN",
+      pinPlaceholder: "Enter 4-6 digit PIN",
+      pinError: "PIN must be 4-6 digits.",
+      login: "Login",
+      logout: "Logout",
+      accountStatusLoggedOut: "Not logged in",
+      accountStatusLoggedIn: "Logged in",
+      totalTasks: "Total Tasks",
+      completedTasks: "Completed",
+      pendingTasks: "Pending",
+      toggleDark: "🌙",
+      toggleLight: "☀️"
+    },
+    fr: {
+      placeholder: "Ajouter une tâche...",
+      add: "Ajouter",
+      all: "Toutes",
+      completed: "Terminées",
+      pending: "En attente",
+      settings: "Paramètres",
+      languageLabel: "Langue / Language / اللغة",
+      setPin: "Définir PIN",
+      pinPlaceholder: "Entrez un PIN de 4 à 6 chiffres",
+      pinError: "Le PIN doit contenir 4 à 6 chiffres.",
+      login: "Connexion",
+      logout: "Déconnexion",
+      accountStatusLoggedOut: "Non connecté",
+      accountStatusLoggedIn: "Connecté",
+      totalTasks: "Tâches totales",
+      completedTasks: "Terminées",
+      pendingTasks: "En attente",
+      toggleDark: "🌙",
+      toggleLight: "☀️"
+    },
+    ar: {
+      placeholder: "أضف مهمة جديدة...",
+      add: "إضافة",
+      all: "الكل",
+      completed: "مكتملة",
+      pending: "معلقة",
+      settings: "الإعدادات",
+      languageLabel: "اللغة / Language / Langue",
+      setPin: "تعيين رمز PIN",
+      pinPlaceholder: "أدخل رمز PIN من 4 إلى 6 أرقام",
+      pinError: "يجب أن يكون رمز PIN من 4 إلى 6 أرقام.",
+      login: "تسجيل الدخول",
+      logout: "تسجيل الخروج",
+      accountStatusLoggedOut: "غير مسجل الدخول",
+      accountStatusLoggedIn: "مسجل الدخول",
+      totalTasks: "مجموع المهام",
+      completedTasks: "مكتملة",
+      pendingTasks: "معلقة",
+      toggleDark: "🌙",
+      toggleLight: "☀️"
+    }
+  };
+
+  // ==== Functions ====
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+    let filteredTasks = [];
+    if (filterStatus === 'all') filteredTasks = tasks;
+    else if (filterStatus === 'completed') filteredTasks = tasks.filter(t => t.completed);
+    else if (filterStatus === 'pending') filteredTasks = tasks.filter(t => !t.completed);
+
+    filteredTasks.forEach((task, idx) => {
+      const li = document.createElement('li');
+      li.className = task.completed ? 'completed' : '';
+      li.innerHTML = `
+        <label>
+          <input type="checkbox" ${task.completed ? 'checked' : ''} data-index="${idx}" />
+          <span>${task.text}</span>
+        </label>
+        <button class="delete-btn" data-index="${idx}" aria-label="Delete task">&times;</button>
+      `;
+      taskList.appendChild(li);
+    });
+
+    updateStatistics();
+  }
+
+  function updateStatistics() {
+    totalTasksSpan.textContent = tasks.length;
+    completedTasksSpan.textContent = tasks.filter(t => t.completed).length;
+    pendingTasksSpan.textContent = tasks.filter(t => !t.completed).length;
+  }
+
+  function addTask() {
+    const text = taskInput.value.trim();
+    if (!text) return;
+    if(pinCode && !isLoggedIn) {
+      alert('Please login first to add tasks.');
+      return;
+    }
+    tasks.push({ text, completed: false });
+    saveTasks();
+    renderTasks();
+    taskInput.value = '';
+  }
+
+  function toggleTaskCompleted(index) {
+    if(pinCode && !isLoggedIn) {
+      alert('Please login first to complete tasks.');
+      renderTasks();
+      return;
+    }
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
+  }
+
+  function deleteTask(index) {
+    if(pinCode && !isLoggedIn) {
+      alert('Please login first to delete tasks.');
+      renderTasks();
+      return;
+    }
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+  }
+
+  function setPin() {
+    const pin = pinInput.value.trim();
+    if (!/^\d{4,6}$/.test(pin)) {
+      pinError.textContent = translations[currentLanguage].pinError;
+      return;
+    }
+    pinError.textContent = '';
+    pinCode = pin;
+    localStorage.setItem('pinCode', pinCode);
+    alert('PIN code set successfully!');
+    pinInput.value = '';
+    logout(); // Force logout on new PIN set
+  }
+
+  function login() {
+    if (!pinCode) {
+      alert('No PIN code set. Please set PIN first.');
+      return;
+    }
+    const userPin = prompt('Enter your PIN code:');
+    if (userPin === pinCode) {
+      isLoggedIn = true;
+      updateAccountStatus();
+      alert('Logged in successfully!');
+      renderTasks();
+    } else {
+      alert('Incorrect PIN.');
+    }
+  }
+
+  function logout() {
+    isLoggedIn = false;
+    updateAccountStatus();
+    renderTasks();
+  }
+
+  function updateAccountStatus() {
+    accountStatus.textContent = isLoggedIn ? translations[currentLanguage].accountStatusLoggedIn : translations[currentLanguage].accountStatusLoggedOut;
+    loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+    logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+  }
+
+  function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    updateTexts();
+  }
+
+  function updateTexts() {
+    taskInput.placeholder = translations[currentLanguage].placeholder;
+    addTaskBtn.textContent = translations[currentLanguage].add;
+    filterButtons.forEach(btn => {
+      btn.textContent = translations[currentLanguage][btn.dataset.filter];
+    });
+    document.querySelector('header h1').textContent = 'Advanced To-Do List'; // Could translate if wanted
+    document.querySelector('#settings-panel h2').textContent = translations[currentLanguage].settings;
+    document.querySelector('label[for="language-select"]').textContent = translations[currentLanguage].languageLabel;
+    setPinBtn.textContent = translations[currentLanguage].setPin;
+    pinInput.placeholder = translations[currentLanguage].pinPlaceholder;
+    loginBtn.textContent = translations[currentLanguage].login;
+    logoutBtn.textContent = translations[currentLanguage].logout;
+    updateAccountStatus();
+    updateStatistics();
+  }
+
+  // Toggle dark/light mode
+  function toggleTheme() {
+    body.classList.toggle('dark-mode');
+    const isDark = body.classList.contains('dark-mode');
+    toggleThemeBtn.textContent = isDark ? translations[currentLanguage].toggleLight : translations[currentLanguage].toggleDark;
+  }
+
+  // ==== Event Listeners ====
+  addTaskBtn.addEventListener('click', addTask);
+  taskInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask();
+  });
+
+  taskList.addEventListener('change', e => {
+    if (e.target.matches('input[type="checkbox"]')) {
+      const index = e.target.dataset.index;
+      toggleTaskCompleted(index);
+    }
+  });
+
+  taskList.addEventListener('click', e => {
+    if (e.target.matches('.delete-btn')) {
+      const index = e.target.dataset.index;
+      deleteTask(index);
+    }
+  });
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterStatus = btn.dataset.filter;
+      renderTasks();
+    });
+  });
+
+  settingsIcon.addEventListener('click', () => {
+    const isOpen = settingsPanel.classList.toggle('open');
+    settingsPanel.setAttribute('aria-hidden', !isOpen);
+  });
+
+  languageSelect.addEventListener('change', e => {
+    switchLanguage(e.target.value);
+  });
+
+  setPinBtn.addEventListener('click', setPin);
+
+  loginBtn.addEventListener('click', login);
+  logoutBtn.addEventListener('click', logout);
+
+  toggleThemeBtn.addEventListener('click', toggleTheme);
+
+  // ==== Init ====
+  (function init() {
+    languageSelect.value = currentLanguage;
+    updateTexts();
+    renderTasks();
+    updateAccountStatus();
+    if(body.classList.contains('dark-mode')) {
+      toggleThemeBtn.textContent = translations[currentLanguage].toggleLight;
+    } else {
+      toggleThemeBtn.textContent = translations[currentLanguage].toggleDark;
+    }
+  })();
+</script>
+
+</body>
+</html>
